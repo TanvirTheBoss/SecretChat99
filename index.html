@@ -6,7 +6,7 @@
     <title>SecretChat99</title>
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         /* CSS extracted from the logo colors */
@@ -37,7 +37,7 @@
         }
 
         .logo img {
-            max-width: 100%;
+            max-width: 80%;
             height: auto;
         }
 
@@ -51,29 +51,34 @@
 
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin: 10px 0;
-            border: 1px solid #FFFFFF;
+            border: 2px solid #32fa9f;
             border-radius: 5px;
             background-color: #1C2E48;
             color: #FFFFFF;
             font-family: 'Lato', sans-serif;
+            font-size: 16px;
         }
 
-        button {
+        input[type="text"]::placeholder, input[type="password"]::placeholder {
+            color: #888;
+        }
+
+        button, input[type="submit"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background-color: #00E79F;
             border: none;
             border-radius: 5px;
             color: #1C2E48;
             font-family: 'Roboto', sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
 
-        button:hover {
+        button:hover, input[type="submit"]:hover {
             background-color: #00C88F;
         }
 
@@ -249,37 +254,24 @@
             function displayMessage(user, message, timestamp) {
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message');
-                messageDiv.innerHTML = `<span class="user">${user}</span>: ${message} <br><span class="time">${timestamp}</span>`;
+                messageDiv.innerHTML = `<span class="user">${user}</span>: ${message} <span class="time">(${timestamp})</span>`;
                 chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
 
-            function handleFileUpload(file) {
-                const storageRef = firebase.storage().ref('uploads/' + file.name);
-                const uploadTask = storageRef.put(file);
-
-                uploadTask.on('state_changed', function(snapshot) {
-                    // Upload progress
-                }, function(error) {
-                    console.log(error);
-                }, function() {
-                    uploadTask.snapshot.ref.getDownloadURL().then(function(downloadURL) {
-                        sendMessage(`File uploaded: <a href="${downloadURL}" target="_blank">${file.name}</a>`);
-                    });
-                });
-            }
+            logoutButton.addEventListener('click', function () {
+                localStorage.removeItem('user');
+                loginContainer.style.display = 'block';
+                chatContainer.style.display = 'none';
+            });
 
             fileInput.addEventListener('change', function() {
                 const file = fileInput.files[0];
                 if (file) {
-                    handleFileUpload(file);
+                    const storageRef = firebase.storage().ref('files/' + file.name);
+                    storageRef.put(file).then(function(snapshot) {
+                        console.log('Uploaded a file!');
+                    });
                 }
-            });
-
-            logoutButton.addEventListener('click', function () {
-                localStorage.removeItem('user');
-                chatContainer.style.display = 'none';
-                loginContainer.style.display = 'block';
             });
         });
     </script>
